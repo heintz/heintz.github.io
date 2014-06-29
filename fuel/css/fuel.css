@@ -1,0 +1,13 @@
+#fuel-add h2 {
+  margin-top: 6px;
+  margin-bottom: 5px;
+}
+
+.container-fluid h1 {
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.panel {
+  margin-bottom: 15px;
+}

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" manifest="fuel.manifest">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Fuel</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/fuel.css" rel="stylesheet">
+    <link href="fuel-icon.png" rel="apple-touch-icon">
+  </head>
+  <body>
+
+    <div class="container-fluid">
+      <h1 class="text-center">Fuel on Board</h1>
+
+      <div class="row" id="fuel-current">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="panel panel-default">
+
+            <div class="panel-heading">
+              <h3 class="panel-title">Current</h3>
+            </div>
+
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="input-group">
+                    <input type="tel" class="form-control" id="fuel-current-percent">
+                    <span class="input-group-addon">%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h4 class="text-center">
+                    <span id="fuel-current-gallons"></span> <small>gallons</small>
+                  </h4>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h4 class="text-center">
+                    <span id="fuel-current-pounds"></span> <small>pounds</small>
+                  </h4>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" id="fuel-target">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Target</h3>
+            </div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="input-group">
+                    <input type="tel" class="form-control" id="fuel-target-percent">
+                    <span class="input-group-addon">%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h4 class="text-center">
+                    <span id="fuel-target-gallons"></span> <small>gallons</small>
+                  </h4>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                  <h4 class="text-center">
+                    <span id="fuel-target-pounds"></span> <small>pounds</small>
+                  </h4>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" id="fuel-add">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Add</h3>
+            </div>
+            <div class="panel-body">
+              <h2 class="text-center">
+                <span id="fuel-add-gallons"></span> <small>gallons</small>
+              </h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/fuel.js"></script>
+  </body>
+</html>
