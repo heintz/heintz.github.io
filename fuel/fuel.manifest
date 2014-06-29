@@ -1,27 +1,16 @@
 CACHE MANIFEST
-# Version: 0.0.2
+# Version: 0.0.1
 
 CACHE:
 fuel-icon.png
-#css/bootstrap-theme.css
-#css/bootstrap-theme.css.map
-#css/bootstrap-theme.min.css
-#css/bootstrap.css
-#css/bootstrap.css.map
+
 css/bootstrap.min.css
 css/fuel.css
 
-#fonts/glyphicons-halflings-regular.eot
-#fonts/glyphicons-halflings-regular.svg
-#fonts/glyphicons-halflings-regular.ttf
-#fonts/glyphicons-halflings-regular.woff
 fonts/lato-300.woff
 fonts/lato-400.woff
 fonts/lato-700.woff
 
 js/fuel.js
-#js/bootstrap.js
 js/bootstrap.min.js
-#js/jquery-2.1.1.js
 js/jquery-2.1.1.min.js
-#js/jquery-2.1.1.min.map

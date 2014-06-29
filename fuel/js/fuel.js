@@ -1,100 +1,105 @@
 fuel = (function($) {
   var
-    maxGallons, clamp, current, target, renderCurrent, renderTarget, format,
-    renderAction,
-    clearCurrent, clearAction, doAction,
-    $fuelCurrentPercent, $fuelCurrentGallons, $fuelCurrentPounds,
-    $fuelTargetPercent, $fuelTargetGallons, $fuelTargetPounds, $fuelAddGallons,
-    $currentContainer, $targetContainer, $addContainer,
-    onFocusFuelCurrentPercent, onFocusFuelTargetPercent,
-    onBlurFuelCurrentPercent, onBlurFuelTargetPercent,
-    onClickAction,
-    initModule;
-
-  clamp = function(a, min, max) {
-    return Math.min(max, Math.max(min, a));
-  };
+    maxGallons, currentPanel, targetPanel, $currentContainer, $targetContainer,
+    $actionContainer, $actionGallons, $actionPanel, $actionTitle,
+    makeLoadPanel, renderAction, doAction, onFocus, onBlur, onClickAction,
+    format, initModule;
 
   format = function(num) {
     return new Number(num).toPrecision(3);
   };
 
-  clearCurrent = function() {
-    $fuelCurrentPercent.val('');
-  };
+  makeLoadPanel = function($container, name, default_value) {
+    var clamp, proto, panel;
 
-  clearTarget = function() {
-    $fuelTargetPercent.val('');
-  };
+    clamp = function(a, min, max) {
+      return Math.min(max, Math.max(min, a));
+    };
 
-  // TODO - factor out commonality with this and the next one
-  renderCurrent = function() {
-    var gallons = 0.01 * current * maxGallons;
-    var pounds = gallons * 6;
-    $fuelCurrentPercent.val(current);
-    $fuelCurrentGallons.text(format(gallons));
-    $fuelCurrentPounds.text(format(pounds));
-  };
+    proto = {
+      loadOrElseDefault: function() {
+        var stored_val = localStorage.getItem(this.name);
+        this.value = stored_val === null ? default_value : parseInt(stored_val);
+      },
 
-  renderTarget = function() {
-    var gallons = 0.01 * target * maxGallons;
-    var pounds = gallons * 6;
-    $fuelTargetPercent.val(target);
-    $fuelTargetGallons.text(format(gallons));
-    $fuelTargetPounds.text(format(pounds));
+      save: function() {
+        localStorage[this.name] = this.value;
+      },
+
+      render: function() {
+        var
+          gallons = 0.01 * this.value * maxGallons,
+          pounds = gallons * 6;
+        this.$percent.val(this.value);
+        this.$gallons.text(format(gallons));
+        this.$pounds.text(format(pounds));
+      },
+
+      onFocus: function() {
+        this.$percent.val('');
+      },
+
+      onBlur: function(event) {
+        var value = clamp(parseInt(event.target.value), 0, 100);
+        this.setValue(isNaN(value) ? default_value : value);
+      },
+
+      setValue: function(value) {
+        this.value = value;
+        this.save();
+        this.render();
+      },
+
+      getValue: function() {
+        return this.value;
+      },
+    };
+    panel = Object.create(proto);
+    panel.$container = $container;
+    panel.name = name;
+    panel.value = default_value;
+    panel.$percent = $container.find('.fuel-percent');
+    panel.$gallons = $container.find('.fuel-gallons');
+    panel.$pounds = $container.find('.fuel-pounds');
+    return panel;
   };
 
   renderAction = function() {
-    var gallons = 0.01 * (target - current) * maxGallons;
-    var $panel = $addContainer.find('.panel');
-    var $title = $panel.find('.panel-title');
-    $fuelAddGallons.text(format(Math.abs(gallons)));
+    var
+      current_value = currentPanel.getValue(),
+      target_value = targetPanel.getValue(),
+      gallons = 0.01 * (target_value - current_value) * maxGallons;
+
+    $actionGallons.text(format(Math.abs(gallons)));
+
     if (gallons >= 0) {
-      $title.text('Add');
-      $panel.removeClass('panel-danger').addClass('panel-success');
+      $actionTitle.text('Add');
+      $actionPanel.removeClass('panel-danger').addClass('panel-success');
     }
     else {
-      $title.text('Drain');
-      $panel.removeClass('panel-success').addClass('panel-danger');
+      $actionTitle.text('Drain');
+      $actionPanel.removeClass('panel-success').addClass('panel-danger');
     }
   };
 
   doAction = function() {
-    current = target;
-    localStorage.current = current;
-    renderCurrent();
+    currentPanel.setValue(targetPanel.getValue());
     renderAction();
   };
 
-  // TODO - factor out commonality with this and the next one
-  // TODO - factor out the logic of setting current and target (including
-  // localStorage)
-  onBlurFuelCurrentPercent = function(event) {
-    var value = clamp(parseInt(event.target.value), 0, 100);
-    current = isNaN(value) ? 0 : value;
-    localStorage.current = current;
-    renderCurrent();
-    renderAction();
-    return true;
+  onFocus = function(panel) {
+    return function(event) {
+      panel.onFocus();
+      return true;
+    };
   };
 
-  onBlurFuelTargetPercent = function(event) {
-    var value = clamp(parseInt(event.target.value), 0, 100);
-    target = isNaN(value) ? 100 : value;
-    localStorage.target = target;
-    renderTarget();
-    renderAction();
-    return true;
-  };
-
-  onFocusFuelCurrentPercent = function(event) {
-    clearCurrent();
-    return true;
-  };
-  
-  onFocusFuelTargetPercent = function(event) {
-    clearTarget();
-    return true;
+  onBlur = function(panel) {
+    return function(event) {
+      panel.onBlur(event);
+      renderAction();
+      return true;
+    };
   };
 
   onClickAction = function(event) {
@@ -102,37 +107,31 @@ fuel = (function($) {
     return true;
   };
 
-  initModule = function(maxGals, $current, $target, $add) {
+  initModule = function(maxGals, $current, $target, $action) {
     maxGallons = maxGals;
 
     $currentContainer = $current;
     $targetContainer = $target;
-    $addContainer = $add;
+    $actionContainer = $action;
+    $actionGallons = $actionContainer.find('#fuel-action-gallons');
+    $actionPanel = $actionContainer.find('.panel');
+    $actionTitle = $actionPanel.find('.panel-title');
 
-    $fuelCurrentPercent = $currentContainer.find('#fuel-current-percent');
-    $fuelCurrentGallons = $currentContainer.find('#fuel-current-gallons');
-    $fuelCurrentPounds = $currentContainer.find('#fuel-current-pounds');
+    currentPanel = makeLoadPanel($currentContainer, 'current', 0);
+    targetPanel = makeLoadPanel($targetContainer, 'target', 100);
 
-    $fuelTargetPercent = $targetContainer.find('#fuel-target-percent');
-    $fuelTargetGallons = $targetContainer.find('#fuel-target-gallons');
-    $fuelTargetPounds = $targetContainer.find('#fuel-target-pounds');
+    currentPanel.loadOrElseDefault();
+    targetPanel.loadOrElseDefault();
 
-    $fuelAddGallons = $addContainer.find('#fuel-add-gallons');
+    currentPanel.$percent.focus(onFocus(currentPanel));
+    targetPanel.$percent.focus(onFocus(targetPanel));
+    currentPanel.$percent.blur(onBlur(currentPanel));
+    targetPanel.$percent.blur(onBlur(targetPanel));
 
-    $fuelCurrentPercent.focus(onFocusFuelCurrentPercent);
-    $fuelTargetPercent.focus(onFocusFuelTargetPercent);
-    $fuelCurrentPercent.blur(onBlurFuelCurrentPercent);
-    $fuelTargetPercent.blur(onBlurFuelTargetPercent);
+    $actionContainer.click(onClickAction);
 
-    $addContainer.click(onClickAction);
-
-    // Current and target loads, as integer percentages.  i.e., 100 --> 100%
-    var storedCurrent = localStorage.getItem('current');
-    current = storedCurrent === null ? 0 : parseInt(storedCurrent);
-    var storedTarget = localStorage.getItem('target');
-    target = storedTarget === null ? 100 : parseInt(storedTarget);
-    renderCurrent();
-    renderTarget();
+    currentPanel.render();
+    targetPanel.render();
     renderAction();
   };
 
@@ -141,10 +140,8 @@ fuel = (function($) {
   };
 
   // TODO:
+  //   - get rid of doAction
   //   - make sure icon used. 
-  //   - refactor common behavior
-  //   - change add container to action, since it isn't always add
-  //   - add prompt about adding to home screen
   //   - clean up manifest
   //   - push to github
 }(jQuery));
@@ -152,6 +149,6 @@ fuel = (function($) {
 $(document).ready(function() {
   var $current = $('#fuel-current');
   var $target = $('#fuel-target');
-  var $add = $('#fuel-add');
-  fuel.initModule(57.6, $current, $target, $add);
+  var $action = $('#fuel-action');
+  fuel.initModule(57.6, $current, $target, $action);
 });
