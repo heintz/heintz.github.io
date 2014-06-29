@@ -2,8 +2,8 @@ fuel = (function($) {
   var
     maxGallons, currentPanel, targetPanel, $currentContainer, $targetContainer,
     $actionContainer, $actionGallons, $actionPanel, $actionTitle,
-    makeLoadPanel, renderAction, doAction, onFocus, onBlur, onClickAction,
-    format, initModule;
+    makeLoadPanel, renderAction, onFocus, onBlur, onClickAction, format,
+    initModule;
 
   format = function(num) {
     return new Number(num).toPrecision(3);
@@ -82,11 +82,6 @@ fuel = (function($) {
     }
   };
 
-  doAction = function() {
-    currentPanel.setValue(targetPanel.getValue());
-    renderAction();
-  };
-
   onFocus = function(panel) {
     return function(event) {
       panel.onFocus();
@@ -100,11 +95,6 @@ fuel = (function($) {
       renderAction();
       return true;
     };
-  };
-
-  onClickAction = function(event) {
-    doAction();
-    return true;
   };
 
   initModule = function(maxGals, $current, $target, $action) {
@@ -128,8 +118,6 @@ fuel = (function($) {
     currentPanel.$percent.blur(onBlur(currentPanel));
     targetPanel.$percent.blur(onBlur(targetPanel));
 
-    $actionContainer.click(onClickAction);
-
     currentPanel.render();
     targetPanel.render();
     renderAction();
@@ -138,12 +126,6 @@ fuel = (function($) {
   return {
     initModule: initModule
   };
-
-  // TODO:
-  //   - get rid of doAction
-  //   - make sure icon used. 
-  //   - clean up manifest
-  //   - push to github
 }(jQuery));
 
 $(document).ready(function() {
